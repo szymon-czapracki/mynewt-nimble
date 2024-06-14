@@ -1045,6 +1045,7 @@ big_sync(struct ble_audio_broadcast_sink *sink, const uint8_t *base, uint8_t bas
     rc = ble_iso_big_sync_create(&big_sync_create_params, &sink->big_handle);
     if (rc != 0) {
         BLE_HS_LOG_ERROR("big sync failed (%d)\n", rc);
+        big_sync_state_set(sink, BIG_SYNC_STATE_FAILED);
         return;
     }
 

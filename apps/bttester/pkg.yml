@@ -32,6 +32,7 @@ pkg.deps:
     - "@apache-mynewt-core/sys/stats"
     - "@apache-mynewt-core/sys/shell"
     - "@apache-mynewt-nimble/nimble/host"
+    - "@apache-mynewt-nimble/nimble/host/audio"
     - "@apache-mynewt-nimble/nimble/host/util"
     - "@apache-mynewt-nimble/nimble/host/services/gap"
     - "@apache-mynewt-nimble/nimble/host/services/gatt"

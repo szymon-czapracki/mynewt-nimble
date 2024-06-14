@@ -204,7 +204,7 @@ ble_svc_audio_bass_receive_state_notify(struct ble_svc_audio_bass_rcv_state_entr
 {
     int i;
 
-    for (i = 0; i < sizeof(ble_svc_audio_bass_chrs); i++) {
+    for (i = 0; i < ARRAY_SIZE(ble_svc_audio_bass_chrs); i++) {
         if (ble_svc_audio_bass_chrs[i].arg == state) {
             ble_gatts_chr_updated(*ble_svc_audio_bass_chrs[i].val_handle);
             return 0;
@@ -220,7 +220,7 @@ ble_svc_audio_bass_receive_state_find_by_source_id(struct ble_svc_audio_bass_rcv
 {
     int i;
 
-    for (i = 0; i < sizeof(receiver_states); i++) {
+    for (i = 0; i < ARRAY_SIZE(receiver_states); i++) {
         if (receiver_states[i].source_id == source_id) {
             *out_state = &receiver_states[i];
             return 0;
@@ -235,7 +235,7 @@ ble_svc_audio_bass_receive_state_find_free(struct ble_svc_audio_bass_rcv_state_e
 {
     int i;
 
-    for (i = 0; i < sizeof(receiver_states); i++) {
+    for (i = 0; i < ARRAY_SIZE(receiver_states); i++) {
         if (receiver_states[i].source_id == BLE_SVC_AUDIO_BASS_RECEIVE_STATE_SRC_ID_NONE) {
             *out_state = &receiver_states[i];
             return 0;
@@ -601,7 +601,7 @@ ble_svc_audio_bass_set_broadcast_code(uint8_t *data, uint16_t data_len, uint16_t
         return BLE_ATT_ERR_WRITE_REQ_REJECTED;
     }
 
-    ev.bass_set_broadcast_code.source_id = data[0];
+    ev.bass_set_broadcast_code.source_id = data[1];
 
     ble_svc_audio_bass_receive_state_find_by_source_id(&rcv_state,
                                                        ev.bass_set_broadcast_code.source_id);
@@ -609,7 +609,10 @@ ble_svc_audio_bass_set_broadcast_code(uint8_t *data, uint16_t data_len, uint16_t
         return BLE_SVC_AUDIO_BASS_ERR_INVALID_SOURCE_ID;
     }
 
-    memcpy(ev.bass_set_broadcast_code.broadcast_code, &data[1], BLE_AUDIO_BROADCAST_CODE_SIZE);
+    memcpy(ev.bass_set_broadcast_code.broadcast_code, &data[2], BLE_AUDIO_BROADCAST_CODE_SIZE);
+    rcv_state->state.big_encryption = BLE_SVC_AUDIO_BASS_BIG_ENC_DECRYPTING;
+
+    ble_svc_audio_bass_receive_state_notify(rcv_state);
 
     ble_audio_event_listener_call(&ev);
 
@@ -632,7 +635,8 @@ ble_svc_audio_bass_remove_source(uint8_t *data, uint16_t data_len, uint16_t conn
     int rc = 0;
     int i;
 
-    ev.bass_set_broadcast_code.source_id = data[1];
+    ev.bass_operation_status.source_id = data[1];
+    operation.op = BLE_SVC_AUDIO_BASS_OPERATION_REMOVE_SOURCE;
 
     ble_svc_audio_bass_receive_state_find_by_source_id(&rcv_state,
                                                        ev.bass_operation_status.source_id);
