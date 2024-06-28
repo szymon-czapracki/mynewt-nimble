@@ -24,6 +24,7 @@
 #include "ble_l2cap_priv.h"
 #include "ble_l2cap_coc_priv.h"
 #include "ble_l2cap_sig_priv.h"
+#include "os/os_mbuf.h"
 
 #if MYNEWT_VAL(BLE_L2CAP_COC_MAX_NUM) != 0 && NIMBLE_BLE_CONNECT
 
@@ -661,7 +662,10 @@ int
 ble_l2cap_coc_send(struct ble_l2cap_chan *chan, struct os_mbuf *sdu_tx)
 {
     struct ble_l2cap_coc_endpoint *tx;
+    uint8_t sdu_txior;
 
+    sdu_txior = OS_MBUF_PKTLEN(sdu_tx);
+    printf("%u", sdu_txior);
 
     tx = &chan->coc_tx;
 

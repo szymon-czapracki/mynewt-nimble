@@ -18,6 +18,7 @@
  */
 
 #include "syscfg/syscfg.h"
+#include <stdio.h>
 #define BLE_NPL_LOG_MODULE BLE_EATT_LOG
 #include <nimble/nimble_npl_log.h>
 
@@ -489,7 +490,7 @@ ble_eatt_tx(uint16_t conn_handle, uint16_t cid, struct os_mbuf *txom)
         ble_npl_eventq_put(ble_hs_evq_get(), &eatt->wakeup_ev);
     } else {
         BLE_EATT_LOG_ERROR("eatt: %s, ERROR %d ", __func__, rc);
-        assert(0);
+        goto error;
     }
 done:
     return 0;
