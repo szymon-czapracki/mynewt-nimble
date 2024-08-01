@@ -26,6 +26,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#ifndef __packed
+#define __packed    __attribute__((__packed__))
+#endif
+
 /* Core Service */
 #define BTP_CORE_READ_SUPPORTED_COMMANDS    0x01
 struct btp_core_read_supported_commands_rp {

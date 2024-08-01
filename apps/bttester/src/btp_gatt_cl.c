@@ -184,7 +184,7 @@ disc_prim_svcs_cb(uint16_t conn_handle,
     const ble_uuid_any_t *uuid;
     uint8_t uuid_length;
     struct os_mbuf *buf = os_msys_get(0, 0);
-    uint8_t opcode = (uint8_t) (int) arg;
+    uint8_t opcode = (uint8_t) (intptr_t) arg;
     uint8_t err = (uint8_t) error->status;
     int rc = 0;
 
@@ -312,7 +312,7 @@ find_included_cb(uint16_t conn_handle,
     struct btp_gattc_find_included_rp *rp;
     struct btp_gatt_included *included;
     const ble_uuid_any_t *uuid;
-    int service_handle = (int) arg;
+    int service_handle = (intptr_t) arg;
     uint8_t uuid_length;
     uint8_t err = (uint8_t) error->status;
     struct os_mbuf *buf = os_msys_get(0, 0);
@@ -409,7 +409,7 @@ find_included(const void *cmd, uint16_t cmd_len,
 
     if (ble_gattc_find_inc_svcs(conn.conn_handle, start_handle, end_handle,
                                 find_included_cb,
-                                (void *) service_handle_arg)) {
+                                (void *) (uintptr_t) service_handle_arg)) {
         discover_destroy();
         return BTP_STATUS_FAILED;
     }
@@ -426,7 +426,7 @@ disc_chrc_cb(uint16_t conn_handle,
     struct btp_gatt_characteristic *chrc;
     const ble_uuid_any_t *uuid;
     uint8_t uuid_length;
-    uint8_t opcode = (uint8_t) (int) arg;
+    uint8_t opcode = (uint8_t) (intptr_t) arg;
     uint8_t err = (uint8_t) error->status;
     struct os_mbuf *buf = os_msys_get(0, 0);
     struct ble_gap_conn_desc conn;
@@ -687,7 +687,7 @@ read_cb(uint16_t conn_handle,
         void *arg)
 {
     struct btp_gattc_read_rp *rp;
-    uint8_t opcode = (uint8_t) (int) arg;
+    uint8_t opcode = (uint8_t) (intptr_t) arg;
     struct os_mbuf *buf = os_msys_get(0, 0);
     struct ble_gap_conn_desc conn;
     int rc = 0;
@@ -768,7 +768,7 @@ read_uuid_cb(uint16_t conn_handle,
 {
     struct btp_gattc_read_uuid_rp *rp;
     struct btp_gatt_read_uuid_chr *chr;
-    uint8_t opcode = (uint8_t) (int) arg;
+    uint8_t opcode = (uint8_t) (intptr_t) arg;
     uint8_t err = (uint8_t) error->status;
     struct os_mbuf *buf = os_msys_get(0, 0);
     struct ble_gap_conn_desc conn;
@@ -872,7 +872,7 @@ read_long_cb(uint16_t conn_handle,
              void *arg)
 {
     struct btp_gattc_read_rp *rp;;
-    uint8_t opcode = (uint8_t) (int) arg;
+    uint8_t opcode = (uint8_t) (intptr_t) arg;
     uint8_t err = (uint8_t) error->status;
     struct os_mbuf *buf = os_msys_get(0, 0);
     struct ble_gap_conn_desc conn;
@@ -1026,7 +1026,7 @@ write_cb(uint16_t conn_handle, const struct ble_gatt_error *error,
 {
     struct btp_gattc_write_rp *rp;
     uint8_t err = (uint8_t) error->status;
-    uint8_t opcode = (uint8_t) (int) arg;
+    uint8_t opcode = (uint8_t) (intptr_t) arg;
     struct os_mbuf *buf = os_msys_get(0, 0);
     struct ble_gap_conn_desc conn;
     int rc = 0;
@@ -1211,7 +1211,7 @@ subscribe_cb(uint16_t conn_handle,
 {
     struct btp_subscribe_rp *rp;
     uint8_t err = (uint8_t) error->status;
-    uint8_t opcode = (uint8_t) (int) arg;
+    uint8_t opcode = (uint8_t) (intptr_t) arg;
     struct os_mbuf *buf = os_msys_get(0, 0);
     struct ble_gap_conn_desc conn;
     int rc = 0;
@@ -1255,7 +1255,7 @@ enable_subscription(uint16_t conn_handle, uint16_t ccc_handle,
                              &value,
                              sizeof(value),
                              subscribe_cb,
-                             (void *) opcode)) {
+                             (void *) (uintptr_t) opcode)) {
         return -EINVAL;
     }
 
@@ -1286,7 +1286,7 @@ disable_subscription(uint16_t conn_handle, uint16_t ccc_handle)
                              &value,
                              sizeof(value),
                              subscribe_cb,
-                             (void *) opcode)) {
+                             (void *) (uintptr_t) opcode)) {
         return -EINVAL;
     }
 

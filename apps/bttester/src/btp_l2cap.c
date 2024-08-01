@@ -105,8 +105,8 @@ get_channel(uint8_t chan_id)
 static void
 tester_l2cap_coc_recv(struct ble_l2cap_chan *chan, struct os_mbuf *sdu)
 {
-    SYS_LOG_DBG("LE CoC SDU received, chan: 0x%08lx, data len %d",
-                (uint32_t) chan, OS_MBUF_PKTLEN(sdu));
+    /*SYS_LOG_DBG("LE CoC SDU received, chan: 0x%08lx, data len %d",
+                (uint32_t) chan, OS_MBUF_PKTLEN(sdu));*/
 
     os_mbuf_free_chain(sdu);
     if (!hold_credit) {
@@ -226,8 +226,8 @@ accept_cb(uint16_t conn_handle, uint16_t peer_mtu,
 {
     struct os_mbuf *sdu_rx;
 
-    SYS_LOG_DBG("LE CoC accepting, chan: 0x%08lx, peer_mtu %d",
-                (uint32_t) chan, peer_mtu);
+    /*SYS_LOG_DBG("LE CoC accepting, chan: 0x%08lx, peer_mtu %d",
+                (uint32_t) chan, peer_mtu);*/
 
     sdu_rx = os_mbuf_get_pkthdr(&sdu_os_mbuf_pool, 0);
     if (!sdu_rx) {
@@ -256,14 +256,14 @@ tester_l2cap_event(struct ble_l2cap_event *event, void *arg)
             return 0;
         }
 
-        console_printf("LE COC connected, conn: %d, chan: 0x%08lx, "
+        /*console_printf("LE COC connected, conn: %d, chan: 0x%08lx, "
                        "psm: 0x%02x, scid: 0x%04x, dcid: 0x%04x, "
                        "our_mps: %d, our_mtu: %d, peer_mps: %d, "
                        "peer_mtu: %d\n", event->connect.conn_handle,
                        (uint32_t) event->connect.chan, chan_info.psm,
                        chan_info.scid, chan_info.dcid,
                        chan_info.our_l2cap_mtu, chan_info.our_coc_mtu,
-                       chan_info.peer_l2cap_mtu, chan_info.peer_coc_mtu);
+                       chan_info.peer_l2cap_mtu, chan_info.peer_coc_mtu);*/
 
         connected_cb(event->connect.conn_handle,
                      event->connect.chan, &chan_info, arg);
@@ -274,8 +274,8 @@ tester_l2cap_event(struct ble_l2cap_event *event, void *arg)
                                     &chan_info)) {
             assert(0);
         }
-        console_printf("LE CoC disconnected, chan: 0x%08lx\n",
-                       (uint32_t) event->disconnect.chan);
+        /*console_printf("LE CoC disconnected, chan: 0x%08lx\n",
+                       (uint32_t) event->disconnect.chan);*/
 
         disconnected_cb(event->disconnect.conn_handle,
                         event->disconnect.chan, &chan_info, arg);
@@ -310,41 +310,41 @@ tester_l2cap_event(struct ble_l2cap_event *event, void *arg)
             }
         }
 
-        console_printf(
+        /*console_printf(
             "LE CoC accept, chan: 0x%08lx, handle: %u, sdu_size: %u\n",
             (uint32_t) event->accept.chan,
             event->accept.conn_handle,
-            event->accept.peer_sdu_size);
+            event->accept.peer_sdu_size);*/
 
         return accept_cb(event->accept.conn_handle,
                          event->accept.peer_sdu_size,
                          event->accept.chan);
 
     case BLE_L2CAP_EVENT_COC_DATA_RECEIVED:
-        console_printf(
+        /*console_printf(
             "LE CoC data received, chan: 0x%08lx, handle: %u, sdu_len: %u\n",
             (uint32_t) event->receive.chan,
             event->receive.conn_handle,
-            OS_MBUF_PKTLEN(event->receive.sdu_rx));
+            OS_MBUF_PKTLEN(event->receive.sdu_rx));*/
 
         recv_cb(event->receive.conn_handle, event->receive.chan,
                 event->receive.sdu_rx, arg);
         return 0;
     case BLE_L2CAP_EVENT_COC_TX_UNSTALLED:
-        console_printf(
+        /*console_printf(
             "LE CoC tx unstalled, chan: 0x%08lx, handle: %u, status: %d\n",
             (uint32_t) event->tx_unstalled.chan,
             event->tx_unstalled.conn_handle,
-            event->tx_unstalled.status);
+            event->tx_unstalled.status);*/
         return 0;
     case BLE_L2CAP_EVENT_COC_RECONFIG_COMPLETED:
         if (ble_l2cap_get_chan_info(event->reconfigured.chan,
                                     &chan_info)) {
             assert(0);
         }
-        console_printf("LE CoC reconfigure completed status 0x%02x, "
+        /*console_printf("LE CoC reconfigure completed status 0x%02x, "
                        "chan: 0x%08lx\n", event->reconfigured.status,
-                       (uint32_t) event->reconfigured.chan);
+                       (uint32_t) event->reconfigured.chan);*/
 
         if (event->reconfigured.status == 0) {
             console_printf("\t our_mps: %d our_mtu %d\n",
@@ -361,9 +361,9 @@ tester_l2cap_event(struct ble_l2cap_event *event, void *arg)
                                     &chan_info)) {
             assert(0);
         }
-        console_printf("LE CoC peer reconfigured status 0x%02x, "
+        /*console_printf("LE CoC peer reconfigured status 0x%02x, "
                        "chan: 0x%08lx\n", event->reconfigured.status,
-                       (uint32_t) event->reconfigured.chan);
+                       (uint32_t) event->reconfigured.chan);*/
 
         if (event->reconfigured.status == 0) {
             console_printf("\t peer_mps: %d peer_mtu %d\n",

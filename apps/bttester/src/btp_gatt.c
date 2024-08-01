@@ -695,7 +695,7 @@ read_cb(uint16_t conn_handle,
         void *arg)
 {
     struct btp_gatt_read_rp *rp = (void *) gatt_buf.buf;
-    uint8_t btp_opcode = (uint8_t) (int) arg;
+    uint8_t btp_opcode = (uint8_t) (intptr_t) arg;
 
     SYS_LOG_DBG("status=%d", error->status);
 
@@ -760,7 +760,7 @@ read_long_cb(uint16_t conn_handle,
              void *arg)
 {
     struct btp_gatt_read_rp *rp = (void *) gatt_buf.buf;
-    uint8_t btp_opcode = (uint8_t) (int) arg;
+    uint8_t btp_opcode = (uint8_t) (intptr_t) arg;
 
     SYS_LOG_DBG("status=%d", error->status);
 
@@ -896,7 +896,7 @@ write_rsp(uint16_t conn_handle, const struct ble_gatt_error *error,
           void *arg)
 {
     uint8_t err = (uint8_t) error->status;
-    uint8_t btp_opcode = (uint8_t) (int) arg;
+    uint8_t btp_opcode = (uint8_t) (intptr_t) arg;
 
     SYS_LOG_DBG("");
 
@@ -1087,7 +1087,7 @@ disc_prim_uuid_cb(uint16_t conn_handle,
     struct btp_gatt_service *service;
     const ble_uuid_any_t *uuid;
     uint8_t uuid_length;
-    uint8_t opcode = (uint8_t) (int) arg;
+    uint8_t opcode = (uint8_t) (intptr_t) arg;
 
     SYS_LOG_DBG("");
 
@@ -1259,7 +1259,7 @@ find_included_cb(uint16_t conn_handle,
     struct btp_gatt_find_included_rp *rp = (void *) gatt_buf.buf;
     struct btp_gatt_included *included;
     const ble_uuid_any_t *uuid;
-    int service_handle = (int) arg;
+    int service_handle = (intptr_t) arg;
     uint8_t uuid_length;
 
     SYS_LOG_DBG("");
@@ -1316,7 +1316,7 @@ disc_chrc_cb(uint16_t conn_handle,
     struct btp_gatt_disc_chrc_rp *rp = (void *) gatt_buf.buf;
     struct btp_gatt_characteristic *chrc;
     const ble_uuid_any_t *uuid;
-    uint8_t btp_opcode = (uint8_t) (int) arg;
+    uint8_t btp_opcode = (uint8_t) (intptr_t) arg;
     uint8_t uuid_length;
 
     SYS_LOG_DBG("");
@@ -1503,7 +1503,7 @@ find_included(const void *cmd, uint16_t cmd_len,
 
     if (ble_gattc_find_inc_svcs(conn.conn_handle, start_handle, end_handle,
                                 find_included_cb,
-                                (void *) service_handle_arg)) {
+                                (void *) (uintptr_t) service_handle_arg)) {
         discover_destroy();
         return BTP_STATUS_FAILED;
     }

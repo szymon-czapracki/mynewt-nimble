@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #include "syscfg/syscfg.h"
 #include "console/console.h"
@@ -144,10 +145,10 @@ cmd_handler(struct os_event *ev)
 
     len = le16toh(cmd->hdr.len);
     if (MYNEWT_VAL(BTTESTER_BTP_LOG)) {
-        console_printf("[DBG] received %d bytes: %s\n",
+        /*console_printf("[DBG] received %d bytes: %s\n",
                        sizeof(cmd->hdr) + len,
                        string_from_bytes(cmd->data,
-                                         sizeof(cmd->hdr) + len));
+                                         sizeof(cmd->hdr) + len));*/
     }
 
     btp = find_btp_handler(cmd->hdr.service, cmd->hdr.opcode);
@@ -289,11 +290,11 @@ tester_send_with_index(uint8_t service, uint8_t opcode, uint8_t index,
     }
 
     if (MYNEWT_VAL(BTTESTER_BTP_LOG)) {
-        console_printf("[DBG] send %d bytes hdr: %s\n", sizeof(msg),
-                       string_from_bytes((char *) &msg, sizeof(msg)));
+        /*console_printf("[DBG] send %d bytes hdr: %s\n", sizeof(msg),
+                       string_from_bytes((char *) &msg, sizeof(msg)));*/
         if (data && len) {
-            console_printf("[DBG] send %d bytes data: %s\n", len,
-                           string_from_bytes((char *) data, len));
+            /*console_printf("[DBG] send %d bytes data: %s\n", len,
+                           string_from_bytes((char *) data, len));*/
         }
     }
 }

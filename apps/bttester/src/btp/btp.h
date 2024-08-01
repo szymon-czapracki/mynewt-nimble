@@ -35,6 +35,10 @@
 #include "btp_mesh.h"
 #include "btp_bap.h"
 
+#ifndef __packed
+#define __packed    __attribute__((__packed__))
+#endif
+
 #define BTP_MTU MYNEWT_VAL(BTTESTER_BTP_DATA_SIZE_MAX)
 #define BTP_DATA_MAX_SIZE (BTP_MTU - sizeof(struct btp_hdr))
 
@@ -63,10 +67,7 @@
 #define BTP_STATUS_DELAY_REPLY	0xFF
 
 #define SYS_LOG_DBG(fmt, ...) \
-    if (MYNEWT_VAL(BTTESTER_DEBUG)) { \
-        console_printf("[DBG] %s: " fmt "\n", \
-                   __func__, ## __VA_ARGS__); \
-    }
+    //if (MYNEWT_VAL(BTTESTER_DEBUG)) {}
 #define SYS_LOG_INF(fmt, ...)   console_printf("[INF] %s: " fmt "\n", \
                            __func__, ## __VA_ARGS__);
 #define SYS_LOG_ERR(fmt, ...)   console_printf("[WRN] %s: " fmt "\n", \
