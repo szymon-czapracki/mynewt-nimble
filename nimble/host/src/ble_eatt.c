@@ -75,7 +75,10 @@ static struct ble_gap_event_listener ble_eatt_listener;
 static struct ble_npl_event g_read_sup_cl_feat_ev;
 
 static void ble_eatt_setup_cb(struct ble_npl_event *ev);
+
+#if MYNEWT_VAL(BLE_EATT_AUTO_CONNECT)
 static void ble_eatt_start(uint16_t conn_handle);
+#endif
 
 static struct ble_eatt *
 ble_eatt_find_not_busy(uint16_t conn_handle)
@@ -354,8 +357,10 @@ ble_gatt_eatt_write_cl_cb(uint16_t conn_handle,
         BLE_EATT_LOG_DEBUG("eatt: Cannot write to Client Supported features on peer device\n");
         return 0;
     }
-
+    
+#if (MYNEWT_VAL(BLE_EATT_AUTO_CONNECT))
     ble_eatt_start(conn_handle);
+#endif
     return 0;
 }
 
@@ -500,6 +505,71 @@ error:
     return rc;
 }
 
+#if MYNEWT_VAL(BLE_EATT_AUTO_CONNECT)
+ble_eatt_connect(uint16_t conn_handle, uint8_t chan_num)
+{
+    struct ble_eatt *eatt[chan_num];
+    struct ble_gap_conn_desc desc;
+    struct os_mbuf *om;
+    uint8_t existing_eatts;
+    uint8_t free_slots;
+    int rc;
+    int i;
+
+    rc = ble_gap_conn_find(conn_handle, &desc);
+    assert(rc == 0);
+
+    /* Exceeding per-conn EATT number */
+    if (chan_num > MYNEWT_VAL(BLE_EATT_CHAN_PER_CONN)) {
+        BLE_EATT_LOG_WARN("eatt: Too many EATT channels per conn");
+    }
+
+    /* Get EATT already connected on this channel */
+    existing_eatts = ble_eatt_slist_size(conn_handle);
+
+    /* Calculate free slots for EATT */
+    free_slots = MYNEWT_VAL(BLE_EATT_CHAN_PER_CONN) - existing_eatts;
+    if (free_slots < chan_num) {
+        chan_num = free_slots;
+    }
+
+    for (i = 0; i < chan_num; i++) {
+        eatt[i] = ble_eatt_alloc();
+        eatt[i]->conn_handle = conn_handle;
+        if (!eatt[i]) {
+            BLE_EATT_LOG_ERROR("eatt: Can't alloc eatt on channel %d\n", i);
+            return;
+        }
+    }
+
+    for (i = 0; i < chan_num; i++) {
+        om = os_mbuf_get_pkthdr(&ble_eatt_sdu_os_mbuf_pool, 0);
+        if (!om) {
+            ble_eatt_free(eatt[i]);
+            BLE_EATT_LOG_ERROR("eatt: no memory for sdu\n");
+            return;
+        }
+
+        rc = ble_l2cap_enhanced_connect(eatt[i]->conn_handle, BLE_EATT_PSM,
+                                        MYNEWT_VAL(BLE_EATT_MTU), chan_num,
+                                        &om, ble_eatt_l2cap_event_fn,
+                                        eatt[i]);
+
+        if (rc) {
+            BLE_EATT_LOG_ERROR("eatt: Failed to connect EATT \
+                                on conn_handle 0x%04x (status=%d)\n",
+                                eatt[i]->conn_handle, rc);
+            os_mbuf_free_chain(om);
+            ble_eatt_free(eatt[i]);
+        }
+    }
+
+    /* Setup multiple EATT channels */
+    for (i = 0; i < chan_num; i++) {
+        ble_npl_eventq_put(ble_hs_evq_get(), &eatt[i]->setup_ev);
+    }
+}
+
 static void
 ble_eatt_start(uint16_t conn_handle)
 {
@@ -526,6 +596,7 @@ ble_eatt_start(uint16_t conn_handle)
     /* Setup EATT  */
     ble_npl_eventq_put(ble_hs_evq_get(), &eatt->setup_ev);
 }
+#endif
 
 void
 ble_eatt_init(ble_eatt_att_rx_fn att_rx_cb)

@@ -318,6 +318,19 @@ syscfg.defs:
         value: 1000
 
     # Enhanced ATT bearer options
+    BLE_EATT_AUTO_CONNECT:
+        description: >
+            Enable auto connect for EATT
+        value: 1
+        restrictions:
+            - BLE_L2CAP_ENHANCED_COC
+    BLE_EATT_CHAN_PER_CONN:
+        description: >
+            Maximum number of supported EATT channels per connection.
+        value: 1
+        restrictions:
+            - BLE_L2CAP_ENHANCED_COC
+            - 'BLE_EATT_CHAN_NUM >= BLE_EATT_CHAN_PER_CONN'
     BLE_EATT_CHAN_NUM:
         description: >
             Maximum number of supported EATT channels (in total). If set to 0
