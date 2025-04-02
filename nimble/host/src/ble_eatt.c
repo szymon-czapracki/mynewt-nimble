@@ -108,6 +108,19 @@ ble_eatt_find_by_conn_handle(uint16_t conn_handle)
 }
 
 static struct ble_eatt *
+ble_eatt_find_by_chan(struct ble_l2cap_chan chan)
+{
+    struct ble_eatt *eatt;
+
+    SLIST_FOREACH(eatt, &g_ble_eatt_list, next) {
+        if (eatt->chan == chan) {
+            return eatt;
+        }
+    }
+    return NULL;
+}
+
+static struct ble_eatt *
 ble_eatt_find_by_conn_handle_and_busy_op(uint16_t conn_handle, uint8_t op)
 {
     struct ble_eatt *eatt;
