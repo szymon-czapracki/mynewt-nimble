@@ -251,6 +251,7 @@ ble_eatt_free(struct ble_eatt *eatt)
     os_memblock_put(&ble_eatt_conn_pool, eatt);
 }
 
+/* WIP */
 static int
 ble_eatt_l2cap_event_fn(struct ble_l2cap_event *event, void *arg)
 {
@@ -261,7 +262,11 @@ ble_eatt_l2cap_event_fn(struct ble_l2cap_event *event, void *arg)
 
     switch (event->type) {
     case BLE_L2CAP_EVENT_COC_CONNECTED:
+
         BLE_EATT_LOG_DEBUG("eatt: Connected \n");
+        eatt = ble_eatt_find_by_chan(*event->connect.chan);
+        if (!eatt) {
+        }
         if (event->connect.status) {
             ble_eatt_free(eatt);
             return 0;
@@ -269,11 +274,15 @@ ble_eatt_l2cap_event_fn(struct ble_l2cap_event *event, void *arg)
         eatt->chan = event->connect.chan;
         break;
     case BLE_L2CAP_EVENT_COC_DISCONNECTED:
+        eatt = ble_eatt_find_by_chan(*event->disconnect.chan);
         BLE_EATT_LOG_DEBUG("eatt: Disconnected \n");
         ble_eatt_free(eatt);
         break;
     case BLE_L2CAP_EVENT_COC_ACCEPT:
-        BLE_EATT_LOG_DEBUG("eatt: Accept request\n");
+        /* LOG CONN HANDLE && CID */
+        BLE_EATT_LOG_DEBUG("eatt: Accept request conn_handle: %d cid: %d",
+                            event->accept.conn_handle,
+                            event->accept.chan->dcid);
         eatt = ble_eatt_find_by_conn_handle(event->accept.conn_handle);
         if (eatt) {
             /* For now we accept only one additional coc channel per ACL
@@ -298,10 +307,17 @@ ble_eatt_l2cap_event_fn(struct ble_l2cap_event *event, void *arg)
 
         break;
     case BLE_L2CAP_EVENT_COC_TX_UNSTALLED:
+        eatt = ble_eatt_find_by_chan(*event->disconnect.chan);
+        if (!eatt) {
+            return BLE_HS_ENOMEM;
+        }
         ble_npl_eventq_put(ble_hs_evq_get(), &eatt->wakeup_ev);
         break;
     case BLE_L2CAP_EVENT_COC_DATA_RECEIVED:
-        assert(eatt->chan == event->receive.chan);
+        eatt = ble_eatt_find_by_chan(*event->disconnect.chan);
+        if (!eatt) {
+            return BLE_HS_ENOMEM;
+        }
         opcode = event->receive.sdu_rx->om_data[0];
         if (ble_eatt_supported_rsp(opcode)) {
             ble_npl_eventq_put(ble_hs_evq_get(), &eatt->wakeup_ev);
