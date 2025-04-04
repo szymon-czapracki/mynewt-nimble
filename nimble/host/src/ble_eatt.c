@@ -98,6 +98,7 @@ ble_eatt_find_not_busy(uint16_t conn_handle)
             return eatt;
         }
     }
+
     return NULL;
 }
 
@@ -111,8 +112,8 @@ ble_eatt_find_by_conn_handle(uint16_t conn_handle)
             return eatt;
         }
     }
-    return NULL;
 
+    return NULL;
 }
 
 static struct ble_eatt *
@@ -125,6 +126,7 @@ ble_eatt_find_by_chan(struct ble_l2cap_chan chan)
             return eatt;
         }
     }
+
     return NULL;
 }
 
@@ -153,8 +155,8 @@ ble_eatt_find_by_conn_handle_and_busy_op(uint16_t conn_handle, uint8_t op)
             return eatt;
         }
     }
-    return NULL;
 
+    return NULL;
 }
 
 static struct ble_eatt *
@@ -169,8 +171,8 @@ ble_eatt_find(uint16_t conn_handle, uint16_t cid)
             return eatt;
         }
     }
-    return NULL;
 
+    return NULL;
 }
 
 static int
