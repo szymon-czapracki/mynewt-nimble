@@ -656,42 +656,6 @@ ble_eatt_connect(uint16_t conn_handle, uint8_t chan_num)
     }
 }
 
-static void
-ble_eatt_start(uint16_t conn_handle)
-{
-    struct ble_gap_conn_desc desc;
-    struct ble_eatt *eatt[MYNEWT_VAL(BLE_EATT_CHAN_PER_CONN)];
-    uint8_t existing_eatts;
-    uint8_t free_slots;
-    int rc;
-    int i;
-
-    rc = ble_gap_conn_find(conn_handle, &desc);
-    assert(rc == 0);
-
-
-    /* Get EATT already established for this conn_handle */
-    existing_eatts = ble_eatt_slist_size(conn_handle);
-
-    /* Calculate free slots for EATT */
-    free_slots = MYNEWT_VAL(BLE_EATT_CHAN_PER_CONN) - existing_eatts;
-
-    for (i = 0; i < free_slots; i++) {
-        eatt[i] = ble_eatt_alloc();
-        if (!eatt[i]) {
-            BLE_EATT_LOG_ERROR("eatt: Can't alloc eatt on channel %d\n", i);
-            return;
-        }
-        eatt[i]->conn_handle = conn_handle;
-    }
-
-    /* Setup multiple EATT channels */
-    for (i = 0; i < free_slots; i++) {
-        ble_npl_eventq_put(ble_hs_evq_get(), &eatt[i]->setup_ev);
-    }
-}
-#endif
-
 void
 ble_eatt_init(ble_eatt_att_rx_fn att_rx_cb)
 {
