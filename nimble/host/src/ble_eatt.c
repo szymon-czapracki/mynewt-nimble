@@ -565,6 +565,32 @@ error:
     return rc;
 }
 
+static void
+ble_eatt_retry(uint16_t conn_handle)
+{
+    struct ble_gap_conn_desc desc;
+    int rc;
+    uint16_t time;
+
+    rc = ble_gap_conn_find(conn_handle, &desc);
+    assert(rc == 0);
+
+    /* Peripheral time delay for collision */
+    time = (rand() % 11) * 2 * (desc.conn_latency + 1) * desc.conn_itvl;
+
+    /* 5.3 Vol 3, Part G, Sec. 5.4 L2CAP collision mitigation
+     * Peripheral shall wait some time before retrying connection
+     * Peripheral is supposed to wait before reconnecting, master
+     * can initiate retry right away.
+     */
+    if (desc.role == BLE_GAP_ROLE_SLAVE) {
+        BLE_EATT_LOG_DEBUG("eatt: Connection collision detected\n");
+        os_callout_reset(&eatt_conn_timer, time);
+    } else {
+        ble_eatt_connect(conn_handle, MYNEWT_VAL(BLE_EATT_CHAN_PER_CONN));
+    }
+}
+
 #if MYNEWT_VAL(BLE_EATT_AUTO_CONNECT)
 ble_eatt_connect(uint16_t conn_handle, uint8_t chan_num)
 {
