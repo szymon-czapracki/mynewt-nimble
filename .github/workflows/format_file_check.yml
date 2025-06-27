@@ -21,7 +21,7 @@ name: Sync clang-format
 
 on:
   schedule:
-    - cron: '30 12 * * *'
+    - cron: '50 14 * * *'
 
 jobs:
   sync:
