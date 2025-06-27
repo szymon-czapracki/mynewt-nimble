@@ -21,7 +21,7 @@ name: Sync clang-format
 
 on:
   schedule:
-    - cron: '0 6 * * *'
+    - cron: '30 12 * * *'
 
 jobs:
   sync:
@@ -52,7 +52,7 @@ jobs:
             echo "changed=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Create Pull Request
+      - name: Create Pull Request Test
         if: steps.changed.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v7
         with:
